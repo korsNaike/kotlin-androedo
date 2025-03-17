@@ -5,18 +5,30 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -62,7 +74,7 @@ fun AlbumDetailsScreen(
             commentViewModel = commentViewModel,
             onCommentTextChange = { commentText = it },
             onAddComment = {
-                addComment(commentText, albumId, commentViewModel)
+                addComment(commentText, albumId, commentViewModel, "album")
                 commentText = ""
             },
             onEditComment = { editingComment = it }
@@ -164,120 +176,6 @@ private fun PhotoItem(photo: Photo, navController: NavController) {
             .padding(4.dp)
             .clickable { navController.navigate("photo_details/${photo.id}") }
     )
-}
-
-@Composable
-private fun CommentSection(
-    comments: List<Comment>,
-    commentText: String,
-    commentViewModel: CommentViewModel,
-    onCommentTextChange: (String) -> Unit,
-    onAddComment: () -> Unit,
-    onEditComment: (Comment) -> Unit
-) {
-    Column {
-        Text("Комментарии:", style = MaterialTheme.typography.titleMedium)
-        Spacer(Modifier.height(8.dp))
-        CommentList(comments, commentViewModel, onEditComment)
-        AddCommentInput(
-            commentText = commentText,
-            onCommentTextChange = onCommentTextChange,
-            onAddComment = onAddComment
-        )
-    }
-}
-
-@Composable
-private fun CommentList(
-    comments: List<Comment>,
-    commentViewModel: CommentViewModel,
-    onEditComment: (Comment) -> Unit
-) {
-    LazyColumn {
-        items(comments, key = { it.id }) { comment ->
-            CommentItem(
-                comment = comment,
-                onEdit = { onEditComment(comment) },
-                onDelete = { commentViewModel.deleteComment(comment) }
-            )
-        }
-    }
-}
-
-@Composable
-private fun CommentItem(
-    comment: Comment,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(comment.text, Modifier.weight(1f))
-            CommentActions(onEdit, onDelete)
-        }
-    }
-}
-
-@Composable
-private fun CommentActions(onEdit: () -> Unit, onDelete: () -> Unit) {
-    Row {
-        IconButton(onClick = onEdit) {
-            Icon(Icons.Default.Edit, "Редактировать")
-        }
-        IconButton(onClick = onDelete) {
-            Icon(Icons.Default.Delete, "Удалить")
-        }
-    }
-}
-
-@Composable
-private fun AddCommentInput(
-    commentText: String,
-    onCommentTextChange: (String) -> Unit,
-    onAddComment: () -> Unit
-) {
-    Column {
-        Spacer(Modifier.height(16.dp))
-        OutlinedTextField(
-            value = commentText,
-            onValueChange = onCommentTextChange,
-            label = { Text("Добавить комментарий") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(Modifier.height(8.dp))
-        Button(
-            onClick = onAddComment,
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Text("Отправить")
-        }
-    }
-}
-
-private fun addComment(
-    text: String,
-    albumId: Int,
-    commentViewModel: CommentViewModel
-) {
-    if (text.isNotBlank()) {
-        commentViewModel.insertComment(
-            Comment(
-                entityId = albumId,
-                type = "album",
-                text = text
-            )
-        )
-    }
 }
 
 private fun persistUri(context: Context, uri: Uri): Uri {
