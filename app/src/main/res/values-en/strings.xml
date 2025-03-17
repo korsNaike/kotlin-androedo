@@ -1,6 +1,6 @@
 <resources>
     <!-- General strings -->
-    <string name="app_name">unikgallery</string>
+    <string name="app_name">Photo gallery</string>
     
     <!-- Navigation -->
     <string name="nav_home">Home</string>

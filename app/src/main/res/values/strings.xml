@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">unikgallery</string>
+    <string name="app_name">Фотоальбомы</string>
 
     <!-- Navigation -->
     <string name="nav_home">Домой</string>
