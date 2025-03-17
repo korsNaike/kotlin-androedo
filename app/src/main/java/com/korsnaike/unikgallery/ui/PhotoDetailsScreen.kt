@@ -1,32 +1,15 @@
 package com.korsnaike.unikgallery.ui
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -44,10 +27,9 @@ fun PhotoDetailsScreen(
     commentViewModel: CommentViewModel = hiltViewModel()
 ) {
     val photo by photoViewModel.getPhotoById(photoId).observeAsState()
-
-    // Получаем комментарии для фото (тип "photo")
     val comments by commentViewModel.getComments(photoId, "photo").observeAsState(initial = emptyList())
     var commentText by remember { mutableStateOf("") }
+    var editingComment by remember { mutableStateOf<Comment?>(null) }
 
     Scaffold(
         topBar = {
@@ -78,18 +60,17 @@ fun PhotoDetailsScreen(
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                items(comments) { comment ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                    ) {
-                        Text(
-                            text = comment.text,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    }
+                items(comments, key = { it.id }) { comment ->
+                    CommentItem(
+                        comment = comment,
+                        onEdit = {
+                            editingComment = comment
+                            commentText = comment.text
+                        },
+                        onDelete = {
+                            commentViewModel.deleteComment(comment)
+                        }
+                    )
                 }
             }
 
@@ -107,17 +88,59 @@ fun PhotoDetailsScreen(
                 )
                 IconButton(onClick = {
                     if (commentText.isNotBlank()) {
-                        val newComment = Comment(
-                            entityId = photoId,
-                            type = "photo",
-                            text = commentText
-                        )
-                        commentViewModel.insertComment(newComment)
+                        if (editingComment != null) {
+                            val updatedComment = editingComment!!.copy(text = commentText)
+                            commentViewModel.updateComment(updatedComment)
+                            editingComment = null
+                        } else {
+                            val newComment = Comment(
+                                entityId = photoId,
+                                type = "photo",
+                                text = commentText
+                            )
+                            commentViewModel.insertComment(newComment)
+                        }
                         commentText = ""
                     }
                 }) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Отправить комментарий")
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        contentDescription = "Отправить комментарий"
+                    )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun CommentItem(
+    comment: Comment,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = comment.text,
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = onEdit) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = "Редактировать")
+            }
+            IconButton(onClick = onDelete) {
+                Icon(imageVector = Icons.Default.Delete, contentDescription = "Удалить")
             }
         }
     }

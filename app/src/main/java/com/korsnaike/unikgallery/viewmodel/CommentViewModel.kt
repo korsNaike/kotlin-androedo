@@ -22,6 +22,12 @@ class CommentViewModel @Inject constructor(
         }
     }
 
+    fun updateComment(comment: Comment) {
+        viewModelScope.launch {
+            commentRepository.addComment(comment)
+        }
+    }
+
     fun deleteComment(comment: Comment) {
         viewModelScope.launch {
             commentRepository.deleteComment(comment)
