@@ -1,6 +1,8 @@
 package com.korsnaike.unikgallery.ui
 
 import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,7 +23,12 @@ import androidx.navigation.compose.rememberNavController
 import com.korsnaike.unikgallery.data.Album
 import com.korsnaike.unikgallery.viewmodel.AlbumViewModel
 import com.korsnaike.unikgallery.activity.LifecycleDemoActivity
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlbumListScreen(
@@ -82,6 +89,7 @@ fun AlbumListScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AlbumListContent(
     albums: List<Album>,
@@ -103,6 +111,7 @@ fun AlbumListContent(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AlbumItem(
     album: Album,
@@ -124,13 +133,25 @@ fun AlbumItem(
         ) {
             Column {
                 Text(text = album.name, style = MaterialTheme.typography.titleMedium)
-                Text(text = "Создан: ${album.createdAt}", style = MaterialTheme.typography.bodySmall)
+                Text(text = "Создан: ${formatMillisToReadableDate(album.createdAt)}", style = MaterialTheme.typography.bodySmall)
             }
             IconButton(onClick = { onAlbumDelete(album) }) {
                 Icon(imageVector = Icons.Default.Delete, contentDescription = "Удалить альбом")
             }
         }
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun formatMillisToReadableDate(millis: Long): String {
+    // Преобразуем миллисекунды в LocalDateTime по часовому поясу
+    val dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.of("Europe/Moscow"))
+
+    // Создаем форматтер для нужного формата
+    val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
+
+    // Форматируем и возвращаем дату
+    return dateTime.format(formatter)
 }
 
 @Composable
@@ -162,10 +183,4 @@ fun CreateAlbumDialog(
             }
         }
     )
-}
-
-@Composable
-fun AlbumListScreenPreview() {
-    val navController = rememberNavController()
-    AlbumListScreen(navController = navController)
 }
