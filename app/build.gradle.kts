@@ -103,4 +103,5 @@ dependencies {
 
     // Coil для загрузки изображений
     implementation("io.coil-kt:coil:2.4.0")
+    implementation("io.coil-kt:coil-compose:2.2.2")
 }
