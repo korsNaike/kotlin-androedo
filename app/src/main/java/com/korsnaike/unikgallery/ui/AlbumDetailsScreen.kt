@@ -29,7 +29,6 @@ import com.korsnaike.unikgallery.viewmodel.CommentViewModel
 import com.korsnaike.unikgallery.viewmodel.PhotoViewModel
 import java.io.File
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlbumDetailsScreen(
     albumId: Int,
@@ -38,143 +37,246 @@ fun AlbumDetailsScreen(
     photoViewModel: PhotoViewModel = hiltViewModel(),
     commentViewModel: CommentViewModel = hiltViewModel()
 ) {
-    // Получаем список фото для альбома
-    val photos by photoViewModel.getPhotosByAlbum(albumId).observeAsState(initial = emptyList())
-    // Получаем комментарии к альбому (тип "album")
-    val comments by commentViewModel.getComments(albumId, "album").observeAsState(initial = emptyList())
+    val photos by photoViewModel.getPhotosByAlbum(albumId).observeAsState(emptyList())
+    val comments by commentViewModel.getComments(albumId, "album").observeAsState(emptyList())
     var commentText by remember { mutableStateOf("") }
     var editingComment by remember { mutableStateOf<Comment?>(null) }
-
     val context = LocalContext.current
+
+    val photoPickerLauncher = rememberPhotoPickerLauncher(
+        context = context,
+        albumId = albumId,
+        photoViewModel = photoViewModel
+    )
+
+    Scaffold(
+        topBar = { AlbumTopBar(albumName) },
+        floatingActionButton = { AddPhotoButton(photoPickerLauncher) }
+    ) { innerPadding ->
+        AlbumContent(
+            innerPadding = innerPadding,
+            photos = photos,
+            comments = comments,
+            commentText = commentText,
+            navController = navController,
+            commentViewModel = commentViewModel,
+            onCommentTextChange = { commentText = it },
+            onAddComment = {
+                addComment(commentText, albumId, commentViewModel)
+                commentText = ""
+            },
+            onEditComment = { editingComment = it }
+        )
+
+        editingComment?.let {
+            EditCommentDialog(
+                comment = it,
+                onDismiss = { editingComment = null },
+                onSave = { updatedText ->
+                    commentViewModel.updateComment(it.copy(text = updatedText))
+                    editingComment = null
+                }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AlbumTopBar(albumName: String) {
+    TopAppBar(title = { Text(text = "Альбом: $albumName") })
+}
+
+@Composable
+private fun AddPhotoButton(launcher: (String) -> Unit) {
+    FloatingActionButton(onClick = { launcher("image/*") }) {
+        Icon(Icons.Default.AddCircle, "Добавить фото")
+    }
+}
+
+@Composable
+private fun rememberPhotoPickerLauncher(
+    context: Context,
+    albumId: Int,
+    photoViewModel: PhotoViewModel
+): (String) -> Unit {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let { selectedUri ->
-            // Создаем постоянную копию URI, чтобы сохранить доступ к изображению
-            val persistedUri = persistUri(context, selectedUri)
-            // Вставляем новое фото в базу данных
-            val newPhoto = Photo(
-                albumId = albumId,
-                uri = persistedUri.toString()
-            )
-            photoViewModel.insertPhoto(newPhoto)
+        uri?.let {
+            val persistedUri = persistUri(context, it)
+            photoViewModel.insertPhoto(Photo(albumId=albumId, uri=persistedUri.toString()))
         }
     }
+    return { mimeType -> launcher.launch(mimeType) }
+}
 
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text(text = "Альбом: $albumName") })
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                // Симулируем добавление фото с тестовым URI
-                launcher.launch("image/*")
-            }) {
-                Icon(imageVector = Icons.Default.AddCircle, contentDescription = "Добавить фото")
+@Composable
+private fun AlbumContent(
+    innerPadding: PaddingValues,
+    photos: List<Photo>,
+    comments: List<Comment>,
+    commentText: String,
+    navController: NavController,
+    commentViewModel: CommentViewModel,
+    onCommentTextChange: (String) -> Unit,
+    onAddComment: () -> Unit,
+    onEditComment: (Comment) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        PhotoGallery(photos, navController)
+        CommentSection(
+            comments = comments,
+            commentText = commentText,
+            commentViewModel = commentViewModel,
+            onCommentTextChange = onCommentTextChange,
+            onAddComment = onAddComment,
+            onEditComment = onEditComment
+        )
+    }
+}
+
+@Composable
+private fun PhotoGallery(photos: List<Photo>, navController: NavController) {
+    Column {
+        Text("Фото:", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        LazyRow {
+            items(photos) { photo ->
+                PhotoItem(photo, navController)
             }
         }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Text(text = "Фото:", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-            // Отображаем список фото в горизонтальном списке
-            LazyRow {
-                items(photos) { photo ->
-                    AsyncImage(
-                        model = photo.uri,
-                        contentDescription = "Фото альбома",
-                        modifier = Modifier
-                            .size(120.dp)
-                            .padding(4.dp)
-                            .clickable {
-                                navController.navigate("photo_details/${photo.id}")
-                            }
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Комментарии:", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn {
-                items(comments, key = { it.id }) { comment ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = comment.text,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Row {
-                                IconButton(onClick = { editingComment = comment }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Edit,
-                                        contentDescription = "Редактировать"
-                                    )
-                                }
-                                IconButton(onClick = { commentViewModel.deleteComment(comment) }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = "Удалить"
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+    }
+}
 
-            if (editingComment != null) {
-                EditCommentDialog(
-                    comment = editingComment!!,
-                    onDismiss = { editingComment = null },
-                    onSave = { updatedText ->
-                        val updatedComment = editingComment!!.copy(text = updatedText)
-                        commentViewModel.updateComment(updatedComment)
-                        editingComment = null
-                    }
-                )
-            }
+@Composable
+private fun PhotoItem(photo: Photo, navController: NavController) {
+    AsyncImage(
+        model = photo.uri,
+        contentDescription = "Фото альбома",
+        modifier = Modifier
+            .size(120.dp)
+            .padding(4.dp)
+            .clickable { navController.navigate("photo_details/${photo.id}") }
+    )
+}
 
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
-                value = commentText,
-                onValueChange = { commentText = it },
-                label = { Text("Добавить комментарий") },
-                modifier = Modifier.fillMaxWidth()
+@Composable
+private fun CommentSection(
+    comments: List<Comment>,
+    commentText: String,
+    commentViewModel: CommentViewModel,
+    onCommentTextChange: (String) -> Unit,
+    onAddComment: () -> Unit,
+    onEditComment: (Comment) -> Unit
+) {
+    Column {
+        Text("Комментарии:", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        CommentList(comments, commentViewModel, onEditComment)
+        AddCommentInput(
+            commentText = commentText,
+            onCommentTextChange = onCommentTextChange,
+            onAddComment = onAddComment
+        )
+    }
+}
+
+@Composable
+private fun CommentList(
+    comments: List<Comment>,
+    commentViewModel: CommentViewModel,
+    onEditComment: (Comment) -> Unit
+) {
+    LazyColumn {
+        items(comments, key = { it.id }) { comment ->
+            CommentItem(
+                comment = comment,
+                onEdit = { onEditComment(comment) },
+                onDelete = { commentViewModel.deleteComment(comment) }
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(
-                onClick = {
-                    if (commentText.isNotBlank()) {
-                        // Создаём новый комментарий с типом "album"
-                        val newComment = Comment(
-                            entityId = albumId,
-                            type = "album",
-                            text = commentText
-                        )
-                        commentViewModel.insertComment(newComment)
-                        commentText = ""
-                    }
-                },
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Text("Отправить")
-            }
         }
+    }
+}
+
+@Composable
+private fun CommentItem(
+    comment: Comment,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(comment.text, Modifier.weight(1f))
+            CommentActions(onEdit, onDelete)
+        }
+    }
+}
+
+@Composable
+private fun CommentActions(onEdit: () -> Unit, onDelete: () -> Unit) {
+    Row {
+        IconButton(onClick = onEdit) {
+            Icon(Icons.Default.Edit, "Редактировать")
+        }
+        IconButton(onClick = onDelete) {
+            Icon(Icons.Default.Delete, "Удалить")
+        }
+    }
+}
+
+@Composable
+private fun AddCommentInput(
+    commentText: String,
+    onCommentTextChange: (String) -> Unit,
+    onAddComment: () -> Unit
+) {
+    Column {
+        Spacer(Modifier.height(16.dp))
+        OutlinedTextField(
+            value = commentText,
+            onValueChange = onCommentTextChange,
+            label = { Text("Добавить комментарий") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(8.dp))
+        Button(
+            onClick = onAddComment,
+            modifier = Modifier.align(Alignment.End)
+        ) {
+            Text("Отправить")
+        }
+    }
+}
+
+private fun addComment(
+    text: String,
+    albumId: Int,
+    commentViewModel: CommentViewModel
+) {
+    if (text.isNotBlank()) {
+        commentViewModel.insertComment(
+            Comment(
+                entityId = albumId,
+                type = "album",
+                text = text
+            )
+        )
     }
 }
 

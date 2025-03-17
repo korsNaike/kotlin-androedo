@@ -61,7 +61,7 @@ fun PhotoDetailsScreen(
                     .weight(1f)
             ) {
                 items(comments, key = { it.id }) { comment ->
-                    CommentItem(
+                    CommentItemSec(
                         comment = comment,
                         onEdit = {
                             editingComment = comment
@@ -114,7 +114,7 @@ fun PhotoDetailsScreen(
 }
 
 @Composable
-fun CommentItem(
+fun CommentItemSec(
     comment: Comment,
     onEdit: () -> Unit,
     onDelete: () -> Unit
