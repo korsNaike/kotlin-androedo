@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.korsnaike.unikgallery.ui.AlbumListScreen
 import com.korsnaike.unikgallery.ui.theme.UnikgalleryTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,11 +35,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyAppNavHost(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "home", modifier = modifier) {
-        composable("home") { HomeScreen() }
-        // Здесь можно добавить дополнительные маршруты
+    NavHost(navController = navController, startDestination = "album_list", modifier = modifier) {
+        composable("album_list") {
+            AlbumListScreen()
+        }
+        // Здесь можно добавить маршруты для деталей альбома, просмотра фото и комментариев
     }
 }
+
 
 @Composable
 fun HomeScreen() {
