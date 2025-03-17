@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.*
@@ -98,7 +99,7 @@ fun PhotoDetailsScreen(
                         commentText = ""
                     }
                 }) {
-                    Icon(imageVector = Icons.Default.Send, contentDescription = "Отправить комментарий")
+                    Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Отправить комментарий")
                 }
             }
         }

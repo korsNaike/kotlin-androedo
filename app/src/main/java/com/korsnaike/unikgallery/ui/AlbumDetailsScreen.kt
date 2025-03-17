@@ -1,20 +1,29 @@
 package com.korsnaike.unikgallery.ui
 
+import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.korsnaike.unikgallery.data.Comment
+import com.korsnaike.unikgallery.data.Photo
 import com.korsnaike.unikgallery.viewmodel.CommentViewModel
 import com.korsnaike.unikgallery.viewmodel.PhotoViewModel
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,9 +39,33 @@ fun AlbumDetailsScreen(
     val comments by commentViewModel.getComments(albumId, "album").observeAsState(initial = emptyList())
     var commentText by remember { mutableStateOf("") }
 
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { selectedUri ->
+            // Создаем постоянную копию URI, чтобы сохранить доступ к изображению
+            val persistedUri = persistUri(context, selectedUri)
+            // Вставляем новое фото в базу данных
+            val newPhoto = Photo(
+                albumId = albumId,
+                uri = persistedUri.toString()
+            )
+            photoViewModel.insertPhoto(newPhoto)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(text = "Альбом: $albumName") })
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                // Симулируем добавление фото с тестовым URI
+                launcher.launch("image/*")
+            }) {
+                Icon(imageVector = Icons.Default.AddCircle, contentDescription = "Добавить фото")
+            }
         }
     ) { innerPadding ->
         Column(
@@ -101,4 +134,24 @@ fun AlbumDetailsScreen(
             }
         }
     }
+}
+
+private fun persistUri(context: Context, uri: Uri): Uri {
+    // Получаем тип файла
+    val contentResolver = context.contentResolver
+    val mimeType = contentResolver.getType(uri) ?: "image/jpeg"
+
+    // Копируем файл в кеш приложения (или другое место хранения)
+    val inputStream = contentResolver.openInputStream(uri)
+    val fileName = "${System.currentTimeMillis()}.${mimeType.split("/").last()}"
+    val outputFile = File(context.filesDir, fileName)
+
+    inputStream?.use { input ->
+        outputFile.outputStream().use { output ->
+            input.copyTo(output)
+        }
+    }
+
+    // Возвращаем локальный URI файла
+    return Uri.fromFile(outputFile)
 }
