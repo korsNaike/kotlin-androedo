@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -41,6 +43,7 @@ fun AlbumDetailsScreen(
     // Получаем комментарии к альбому (тип "album")
     val comments by commentViewModel.getComments(albumId, "album").observeAsState(initial = emptyList())
     var commentText by remember { mutableStateOf("") }
+    var editingComment by remember { mutableStateOf<Comment?>(null) }
 
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
@@ -98,21 +101,54 @@ fun AlbumDetailsScreen(
             Text(text = "Комментарии:", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
             LazyColumn {
-                items(comments) { comment ->
+                items(comments, key = { it.id }) { comment ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                            .padding(vertical = 4.dp)
                     ) {
-                        Text(
-                            text = comment.text,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(8.dp)
-                        )
+                        Row(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = comment.text,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Row {
+                                IconButton(onClick = { editingComment = comment }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "Редактировать"
+                                    )
+                                }
+                                IconButton(onClick = { commentViewModel.deleteComment(comment) }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Удалить"
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
+
+            if (editingComment != null) {
+                EditCommentDialog(
+                    comment = editingComment!!,
+                    onDismiss = { editingComment = null },
+                    onSave = { updatedText ->
+                        val updatedComment = editingComment!!.copy(text = updatedText)
+                        commentViewModel.updateComment(updatedComment)
+                        editingComment = null
+                    }
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
                 value = commentText,
