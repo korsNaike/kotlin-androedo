@@ -16,6 +16,9 @@ class PhotoViewModel @Inject constructor(
     private val photoRepository: PhotoRepository
 ) : ViewModel() {
 
+    // Получение всех фотографий
+    val allPhotos = photoRepository.getAllPhotos().asLiveData()
+
     fun getPhotosByAlbum(albumId: Int) = photoRepository.getPhotosByAlbum(albumId).asLiveData()
 
     fun getPhotoById(photoId: Int): LiveData<Photo?> = liveData {

@@ -29,6 +29,11 @@
             android:name=".activity.LifecycleDemoActivity"
             android:theme="@style/Theme.AppCompat">
         </activity>
+        <activity
+            android:name=".activity.CatalogActivity"
+            android:theme="@style/Theme.AppCompat"
+            android:label="@string/catalog">
+        </activity>
     </application>
 
 </manifest>

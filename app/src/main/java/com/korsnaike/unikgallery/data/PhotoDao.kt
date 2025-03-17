@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PhotoDao {
+    @Query("SELECT * FROM Photo ORDER BY createdAt DESC")
+    fun getAllPhotos(): Flow<List<Photo>>
+    
     @Query("SELECT * FROM Photo WHERE albumId = :albumId ORDER BY createdAt DESC")
     fun getPhotosByAlbum(albumId: Int): Flow<List<Photo>>
 

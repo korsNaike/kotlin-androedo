@@ -12,6 +12,9 @@ interface AlbumDao {
     @Query("SELECT * FROM Album ORDER BY createdAt DESC")
     fun getAllAlbums(): Flow<List<Album>>
 
+    @Query("SELECT * FROM Album ORDER BY createdAt DESC")
+    fun getAllAlbumsSync(): List<Album>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAlbum(album: Album): Long
 

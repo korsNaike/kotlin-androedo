@@ -20,6 +20,7 @@ import androidx.navigation.navArgument
 import com.korsnaike.unikgallery.ui.AlbumDetailsScreen
 import com.korsnaike.unikgallery.ui.AlbumListScreen
 import com.korsnaike.unikgallery.ui.BottomNavBar
+import com.korsnaike.unikgallery.ui.CatalogScreen
 import com.korsnaike.unikgallery.ui.PhotoDetailsScreen
 import com.korsnaike.unikgallery.ui.SettingsScreen
 import com.korsnaike.unikgallery.ui.theme.UnikgalleryTheme
@@ -78,7 +79,12 @@ fun AppScaffold() {
                 PhotoDetailsScreen(photoId = photoId, navController = navController)
             }
             
-            // Добавляем новый экран настроек
+            // Добавляем экран каталога
+            composable("catalog") {
+                CatalogScreen(navController)
+            }
+            
+            // Добавляем экран настроек
             composable("settings") {
                 SettingsScreen()
             }

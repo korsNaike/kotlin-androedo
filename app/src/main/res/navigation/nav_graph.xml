@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/albumListFragment">
+
+    <!-- Фрагмент списка альбомов -->
+    <fragment
+        android:id="@+id/albumListFragment"
+        android:name="com.korsnaike.unikgallery.ui.fragments.AlbumListFragment"
+        android:label="@string/albums">
+        <action
+            android:id="@+id/action_albumList_to_albumDetails"
+            app:destination="@id/albumDetailsFragment" />
+    </fragment>
+
+    <!-- Фрагмент с деталями альбома -->
+    <fragment
+        android:id="@+id/albumDetailsFragment"
+        android:name="com.korsnaike.unikgallery.ui.fragments.AlbumDetailsFragment"
+        android:label="@string/album_with_name">
+        <argument
+            android:name="albumId"
+            app:argType="integer" />
+        <argument
+            android:name="albumName"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_albumDetails_to_photoDetails"
+            app:destination="@id/photoDetailsFragment" />
+    </fragment>
+
+    <!-- Фрагмент с деталями фотографии -->
+    <fragment
+        android:id="@+id/photoDetailsFragment"
+        android:name="com.korsnaike.unikgallery.ui.fragments.PhotoDetailsFragment"
+        android:label="@string/photo_details">
+        <argument
+            android:name="photoId"
+            app:argType="integer" />
+    </fragment>
+
+    <!-- Фрагмент настроек -->
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.korsnaike.unikgallery.ui.fragments.SettingsFragment"
+        android:label="@string/settings" />
+
+    <!-- Фрагмент каталога фотографий -->
+    <fragment
+        android:id="@+id/catalogFragment"
+        android:name="com.korsnaike.unikgallery.ui.fragments.CatalogFragment"
+        android:label="@string/catalog">
+        <action
+            android:id="@+id/action_catalog_to_photoDetails"
+            app:destination="@id/photoDetailsFragment" />
+    </fragment>
+
+</navigation> 

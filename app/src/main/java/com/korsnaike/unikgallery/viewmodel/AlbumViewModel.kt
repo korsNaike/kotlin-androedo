@@ -28,4 +28,9 @@ class AlbumViewModel @Inject constructor(
             albumRepository.deleteAlbum(album)
         }
     }
+    
+    // Метод для синхронного получения всех альбомов
+    suspend fun getAllAlbumsSync(): List<Album> {
+        return albumRepository.getAllAlbumsSync()
+    }
 }

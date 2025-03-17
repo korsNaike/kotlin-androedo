@@ -9,6 +9,9 @@ import javax.inject.Inject
 class PhotoRepository @Inject constructor(
     private val photoDao: PhotoDao
 ) {
+    // Получение всех фотографий
+    fun getAllPhotos() = photoDao.getAllPhotos()
+    
     fun getPhotosByAlbum(albumId: Int) = photoDao.getPhotosByAlbum(albumId)
 
     suspend fun addPhoto(photo: Photo): List<Long> {
