@@ -40,7 +40,7 @@ fun MyAppNavHost(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "album_list", modifier = modifier) {
         composable("album_list") {
-            AlbumListScreen()
+            AlbumListScreen(navController)
         }
         // Пример маршрута с параметрами albumId и albumName.
         composable(
