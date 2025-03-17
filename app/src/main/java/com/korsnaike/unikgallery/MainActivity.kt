@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.korsnaike.unikgallery.ui.AlbumDetailsScreen
 import com.korsnaike.unikgallery.ui.AlbumListScreen
+import com.korsnaike.unikgallery.ui.PhotoDetailsScreen
 import com.korsnaike.unikgallery.ui.theme.UnikgalleryTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -52,7 +53,16 @@ fun MyAppNavHost(modifier: Modifier = Modifier) {
         ) { backStackEntry ->
             val albumId = backStackEntry.arguments?.getInt("albumId") ?: 0
             val albumName = backStackEntry.arguments?.getString("albumName") ?: "Без названия"
-            AlbumDetailsScreen(albumId = albumId, albumName = albumName)
+            AlbumDetailsScreen(albumId = albumId, albumName = albumName, navController = navController)
+        }
+        composable(
+            route = "photo_details/{photoId}",
+            arguments = listOf(
+                navArgument("photoId") { type = NavType.IntType },
+            )
+        ) { backStackEntry ->
+            val photoId = backStackEntry.arguments?.getInt("photoId") ?: return@composable
+            PhotoDetailsScreen(photoId = photoId)
         }
     }
 }

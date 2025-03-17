@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.korsnaike.unikgallery.data.Comment
 import com.korsnaike.unikgallery.data.Photo
@@ -30,6 +32,7 @@ import java.io.File
 fun AlbumDetailsScreen(
     albumId: Int,
     albumName: String,
+    navController: NavController,
     photoViewModel: PhotoViewModel = hiltViewModel(),
     commentViewModel: CommentViewModel = hiltViewModel()
 ) {
@@ -85,6 +88,9 @@ fun AlbumDetailsScreen(
                         modifier = Modifier
                             .size(120.dp)
                             .padding(4.dp)
+                            .clickable {
+                                navController.navigate("photo_details/${photo.id}")
+                            }
                     )
                 }
             }

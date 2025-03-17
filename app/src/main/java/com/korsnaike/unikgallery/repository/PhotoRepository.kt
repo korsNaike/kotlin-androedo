@@ -1,6 +1,5 @@
 package com.korsnaike.unikgallery.repository
 
-import com.korsnaike.unikgallery.data.Comment
 import com.korsnaike.unikgallery.data.Photo
 import com.korsnaike.unikgallery.data.PhotoDao
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +14,12 @@ class PhotoRepository @Inject constructor(
     suspend fun addPhoto(photo: Photo): List<Long> {
         return withContext(Dispatchers.IO) {
             photoDao.insertPhoto(photo)
+        }
+    }
+
+    suspend fun getPhoto(photoId: Int): Photo {
+        return withContext(Dispatchers.IO) {
+            photoDao.getPhoto(photoId)
         }
     }
 
