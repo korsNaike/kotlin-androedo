@@ -3,6 +3,8 @@ package com.korsnaike.unikgallery.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -15,21 +17,60 @@ import com.korsnaike.unikgallery.viewmodel.AlbumViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlbumListScreen(albumViewModel: AlbumViewModel = hiltViewModel()) {
-    // Получаем список альбомов из ViewModel
     val albums by albumViewModel.albums.observeAsState(initial = emptyList())
+    var showDialog by remember { mutableStateOf(false) }
+    var albumName by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Альбомы") })
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { showDialog = true }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Добавить альбом")
+            }
         }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            items(albums) { album ->
-                AlbumItem(album = album)
+        Box(modifier = Modifier.padding(innerPadding)) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp)
+            ) {
+                items(albums) { album ->
+                    AlbumItem(album = album)
+                }
+            }
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text("Новый альбом") },
+                    text = {
+                        OutlinedTextField(
+                            value = albumName,
+                            onValueChange = { albumName = it },
+                            label = { Text("Название альбома") }
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            if (albumName.isNotBlank()) {
+                                albumViewModel.insertAlbum(
+                                    Album(name = albumName)
+                                )
+                                albumName = ""
+                                showDialog = false
+                            }
+                        }) {
+                            Text("Создать")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDialog = false }) {
+                            Text("Отмена")
+                        }
+                    }
+                )
             }
         }
     }
@@ -40,12 +81,13 @@ fun AlbumItem(album: Album) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = album.name, style = MaterialTheme.typography.titleMedium)
-            // Можно добавить отображение даты создания или другую информацию
+            Text(text = "Создан: ${album.createdAt}", style = MaterialTheme.typography.bodySmall)
         }
     }
 }
+
