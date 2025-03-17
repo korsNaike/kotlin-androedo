@@ -31,10 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.korsnaike.unikgallery.R
 import com.korsnaike.unikgallery.data.Comment
 import com.korsnaike.unikgallery.data.Photo
 import com.korsnaike.unikgallery.viewmodel.CommentViewModel
@@ -96,13 +98,16 @@ fun AlbumDetailsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AlbumTopBar(albumName: String) {
-    TopAppBar(title = { Text(text = "Альбом: $albumName") })
+    TopAppBar(title = { Text(text = stringResource(id = R.string.album_with_name, albumName)) })
 }
 
 @Composable
 private fun AddPhotoButton(launcher: (String) -> Unit) {
     FloatingActionButton(onClick = { launcher("image/*") }) {
-        Icon(Icons.Default.AddCircle, "Добавить фото")
+        Icon(
+            Icons.Default.AddCircle, 
+            contentDescription = stringResource(id = R.string.add_photo)
+        )
     }
 }
 
@@ -156,7 +161,7 @@ private fun AlbumContent(
 @Composable
 private fun PhotoGallery(photos: List<Photo>, navController: NavController) {
     Column {
-        Text("Фото:", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(id = R.string.photos), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
         LazyRow {
             items(photos) { photo ->
@@ -170,7 +175,7 @@ private fun PhotoGallery(photos: List<Photo>, navController: NavController) {
 private fun PhotoItem(photo: Photo, navController: NavController) {
     AsyncImage(
         model = photo.uri,
-        contentDescription = "Фото альбома",
+        contentDescription = stringResource(id = R.string.album_photo),
         modifier = Modifier
             .size(120.dp)
             .padding(4.dp)

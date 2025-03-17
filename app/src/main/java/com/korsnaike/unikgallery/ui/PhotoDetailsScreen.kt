@@ -17,10 +17,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.korsnaike.unikgallery.R
 import com.korsnaike.unikgallery.data.Comment
 import com.korsnaike.unikgallery.viewmodel.CommentViewModel
 import com.korsnaike.unikgallery.viewmodel.PhotoViewModel
@@ -40,7 +42,7 @@ fun PhotoDetailsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Детали фото") })
+            TopAppBar(title = { Text(stringResource(id = R.string.photo_details)) })
         },
     ) { innerPadding ->
         Column(
@@ -52,7 +54,7 @@ fun PhotoDetailsScreen(
             // Отображение фото
             AsyncImage(
                 model = photo?.uri,
-                contentDescription = "Фото",
+                contentDescription = stringResource(id = R.string.photo),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(300.dp)

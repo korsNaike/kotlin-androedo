@@ -16,10 +16,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.korsnaike.unikgallery.R
 import com.korsnaike.unikgallery.data.Album
 import com.korsnaike.unikgallery.viewmodel.AlbumViewModel
 import com.korsnaike.unikgallery.activity.LifecycleDemoActivity
@@ -43,20 +45,26 @@ fun AlbumListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Альбомы") },
+                title = { Text(stringResource(id = R.string.albums)) },
                 actions = {
                     // Кнопка для запуска LifecycleDemoActivity
                     IconButton(onClick = {
                         context.startActivity(Intent(context, LifecycleDemoActivity::class.java))
                     }) {
-                        Icon(imageVector = Icons.Default.Info, contentDescription = "Показать Demo")
+                        Icon(
+                            imageVector = Icons.Default.Info, 
+                            contentDescription = stringResource(id = R.string.show_demo)
+                        )
                     }
                 }
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { showDialog = true }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Добавить альбом")
+                Icon(
+                    imageVector = Icons.Default.Add, 
+                    contentDescription = stringResource(id = R.string.add_album)
+                )
             }
         }
     ) { innerPadding ->
@@ -133,10 +141,16 @@ fun AlbumItem(
         ) {
             Column {
                 Text(text = album.name, style = MaterialTheme.typography.titleMedium)
-                Text(text = "Создан: ${formatMillisToReadableDate(album.createdAt)}", style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = stringResource(id = R.string.created_at, formatMillisToReadableDate(album.createdAt)), 
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
             IconButton(onClick = { onAlbumDelete(album) }) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = "Удалить альбом")
+                Icon(
+                    imageVector = Icons.Default.Delete, 
+                    contentDescription = stringResource(id = R.string.delete_album)
+                )
             }
         }
     }
@@ -163,23 +177,23 @@ fun CreateAlbumDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Новый альбом") },
+        title = { Text(stringResource(id = R.string.new_album)) },
         text = {
             OutlinedTextField(
                 value = albumName,
                 onValueChange = onAlbumNameChange,
-                label = { Text("Название альбома") },
+                label = { Text(stringResource(id = R.string.album_name)) },
                 modifier = Modifier.fillMaxWidth()
             )
         },
         confirmButton = {
             TextButton(onClick = onCreateAlbum) {
-                Text("Создать")
+                Text(stringResource(id = R.string.create))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Отмена")
+                Text(stringResource(id = R.string.cancel))
             }
         }
     )

@@ -12,6 +12,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.korsnaike.unikgallery.R
 import com.korsnaike.unikgallery.data.Comment
 
 @Composable
@@ -24,12 +26,12 @@ fun EditCommentDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Редактировать комментарий") },
+        title = { Text(stringResource(id = R.string.edit_comment)) },
         text = {
             OutlinedTextField(
                 value = editedText,
                 onValueChange = { editedText = it },
-                label = { Text("Комментарий") },
+                label = { Text(stringResource(id = R.string.comment)) },
                 modifier = Modifier.fillMaxWidth()
             )
         },
@@ -41,12 +43,12 @@ fun EditCommentDialog(
                     }
                 }
             ) {
-                Text("Сохранить")
+                Text(stringResource(id = R.string.save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Отменить")
+                Text(stringResource(id = R.string.cancel))
             }
         }
     )

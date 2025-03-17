@@ -22,7 +22,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.korsnaike.unikgallery.R
 import com.korsnaike.unikgallery.data.Comment
 import com.korsnaike.unikgallery.viewmodel.CommentViewModel
 
@@ -36,7 +38,7 @@ fun CommentSection(
     onEditComment: (Comment) -> Unit
 ) {
     Column {
-        Text("Комментарии:", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(id = R.string.comments), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
         CommentList(comments, commentViewModel, onEditComment)
         AddCommentInput(
@@ -92,10 +94,16 @@ private fun CommentItem(
 private fun CommentActions(onEdit: () -> Unit, onDelete: () -> Unit) {
     Row {
         IconButton(onClick = onEdit) {
-            Icon(Icons.Default.Edit, "Редактировать")
+            Icon(
+                Icons.Default.Edit, 
+                contentDescription = stringResource(id = R.string.edit_comment)
+            )
         }
         IconButton(onClick = onDelete) {
-            Icon(Icons.Default.Delete, "Удалить")
+            Icon(
+                Icons.Default.Delete, 
+                contentDescription = stringResource(id = R.string.delete_comment)
+            )
         }
     }
 }
@@ -113,13 +121,13 @@ private fun AddCommentInput(
         OutlinedTextField(
             value = commentText,
             onValueChange = onCommentTextChange,
-            label = { Text("Комментарий") },
+            label = { Text(stringResource(id = R.string.comment)) },
             modifier = Modifier.weight(1f)
         )
         IconButton(onClick = onAddComment) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Send,
-                contentDescription = "Отправить комментарий"
+                contentDescription = stringResource(id = R.string.send_comment)
             )
         }
     }

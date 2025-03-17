@@ -12,11 +12,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.korsnaike.unikgallery.R
 
 // Перечисление пунктов меню
-enum class BottomNavItem(val route: String, val icon: @Composable () -> Unit, val title: String) {
-    Home("album_list", { Icon(Icons.Default.Home, contentDescription = "Домой") }, "Домой"),
-    Settings("settings", { Icon(Icons.Default.Settings, contentDescription = "Настройки") }, "Настройки");
+enum class BottomNavItem(val route: String, val icon: @Composable () -> Unit, val titleResId: Int) {
+    Home("album_list", 
+        { Icon(Icons.Default.Home, contentDescription = stringResource(id = R.string.nav_home)) }, 
+        R.string.nav_home),
+    Settings("settings", 
+        { Icon(Icons.Default.Settings, contentDescription = stringResource(id = R.string.nav_settings)) }, 
+        R.string.nav_settings);
 }
 
 @Composable
@@ -31,7 +36,7 @@ fun BottomNavBar(navController: NavController) {
             
             NavigationBarItem(
                 icon = { item.icon() },
-                label = { Text(text = item.title) },
+                label = { Text(text = stringResource(id = item.titleResId)) },
                 selected = selected,
                 onClick = {
                     navController.navigate(item.route) {

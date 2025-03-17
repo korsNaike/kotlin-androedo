@@ -1,3 +1,37 @@
 <resources>
     <string name="app_name">unikgallery</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Домой</string>
+    <string name="nav_settings">Настройки</string>
+
+    <string name="settings">Настройки</string>
+    <string name="app_settings">Настройки приложения</string>
+    <string name="language">Язык</string>
+    <string name="language_english">Английский</string>
+    <string name="language_russian">Русский</string>
+    <string name="select_language">Выберите язык</string>
+    <string name="language_changed">Язык изменен. Изменения вступят в силу после перезапуска приложения.</string>
+    <string name="apply_changes">Применить изменения</string>
+    <string name="albums">Альбомы</string>
+    <string name="album_with_name">Альбом: %1$s</string>
+    <string name="add_album">Добавить альбом</string>
+    <string name="delete_album">Удалить альбом</string>
+    <string name="new_album">Новый альбом</string>
+    <string name="album_name">Название альбома</string>
+    <string name="create">Создать</string>
+    <string name="cancel">Отмена</string>
+    <string name="created_at">Создан: %1$s</string>
+    <string name="show_demo">Показать Demo</string>
+    <string name="photos">Фото:</string>
+    <string name="album_photo">Фото альбома</string>
+    <string name="add_photo">Добавить фото</string>
+    <string name="photo_details">Детали фото</string>
+    <string name="photo">Фото</string>
+    <string name="comments">Комментарии:</string>
+    <string name="comment">Комментарий</string>
+    <string name="send_comment">Отправить комментарий</string>
+    <string name="edit_comment">Редактировать комментарий</string>
+    <string name="delete_comment">Удалить комментарий</string>
+    <string name="save">Сохранить</string>
 </resources>
