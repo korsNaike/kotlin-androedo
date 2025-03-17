@@ -13,8 +13,8 @@ interface PhotoDao {
     fun getPhotosByAlbum(albumId: Int): Flow<List<Photo>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPhoto(vararg photo: Photo)
+    fun insertPhoto(vararg photo: Photo): List<Long>
 
     @Delete
-    suspend fun deletePhoto(vararg photo: Photo)
+    fun deletePhoto(vararg photo: Photo): Int
 }

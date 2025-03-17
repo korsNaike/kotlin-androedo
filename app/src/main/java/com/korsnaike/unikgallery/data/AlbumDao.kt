@@ -13,8 +13,11 @@ interface AlbumDao {
     fun getAllAlbums(): Flow<List<Album>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAlbum(vararg album: Album): Long
+    fun insertAlbum(album: Album): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAlbums(albums: List<Album>): List<Long>
 
     @Delete
-    suspend fun deleteAlbum(vararg album: Album): Int
+    fun deleteAlbum(album: Album): Int
 }
