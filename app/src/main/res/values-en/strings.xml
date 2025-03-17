@@ -42,4 +42,13 @@
     <string name="edit_comment">Edit comment</string>
     <string name="delete_comment">Delete comment</string>
     <string name="save">Save</string>
+    
+    <!-- Catalog Screen -->
+    <string name="catalog">Catalog</string>
+    <string name="catalog_title">Photo Catalog</string>
+    <string name="photo_opened">Photo #%1$d opened</string>
+    <string name="no_photos">No photos</string>
+    <string name="photo_date">Date: %1$s</string>
+    <string name="photo_album">Album: %1$s</string>
+    <string name="no_album">No album</string>
 </resources>
