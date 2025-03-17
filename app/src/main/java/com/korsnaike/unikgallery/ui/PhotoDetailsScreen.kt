@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.korsnaike.unikgallery.data.Comment
 import com.korsnaike.unikgallery.viewmodel.CommentViewModel
@@ -28,6 +29,7 @@ import com.korsnaike.unikgallery.viewmodel.PhotoViewModel
 @Composable
 fun PhotoDetailsScreen(
     photoId: Int,
+    navController: NavController? = null,
     photoViewModel: PhotoViewModel = hiltViewModel(),
     commentViewModel: CommentViewModel = hiltViewModel()
 ) {
@@ -69,6 +71,17 @@ fun PhotoDetailsScreen(
                 },
                 onEditComment = { editingComment = it }
             )
+            
+            editingComment?.let {
+                EditCommentDialog(
+                    comment = it,
+                    onDismiss = { editingComment = null },
+                    onSave = { updatedText ->
+                        commentViewModel.updateComment(it.copy(text = updatedText))
+                        editingComment = null
+                    }
+                )
+            }
         }
     }
 }
